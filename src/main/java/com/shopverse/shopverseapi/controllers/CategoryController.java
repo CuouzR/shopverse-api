@@ -1,11 +1,11 @@
 package com.shopverse.shopverseapi.controllers;
 
 import com.shopverse.shopverseapi.models.Category;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.shopverse.shopverseapi.service.CategoryService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -13,15 +13,56 @@ import java.util.List;
 public class CategoryController {
 
 
-    @GetMapping
-    public List<Category> getAllCategories() {
+    private final CategoryService categoryService;
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
 
-        return Arrays.asList(
-                new Category(1L, "Tecnología", "Productos electrónicos y computación"),
-                new Category(2L, "Hogar", "Artículos para el hogar y decoración"),
-                new Category(3L, "Ropa", "Indumentaria y accesorios")
+    @GetMapping()
+    public ResponseEntity<List<Category>> getAllCategories() {
+        List<Category> categories = categoryService.getAllCategories();
+        if (categories.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(categories);
+    }
 
-        );
+    @GetMapping("/{id}")
+    public ResponseEntity<Category> getCategoryById(@PathVariable Long id){
+        return categoryService.getCategoryById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping()
+    public ResponseEntity<Category> createCategory(@RequestBody Category category){
+        try {
+            Category categoryCreated = categoryService.createCategory(category);
+            return new ResponseEntity<>(categoryCreated, HttpStatus.CREATED);
+        }catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category category){
+        try{
+            Category categoryUpdated = categoryService.updateCategory(id, category);
+            return ResponseEntity.ok(categoryUpdated);
+        }catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id){
+        try{
+            categoryService.deleteCategoryById(id);
+            return ResponseEntity.noContent().build();
+        }catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
 
     }
 }
