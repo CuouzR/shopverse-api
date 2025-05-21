@@ -1,5 +1,6 @@
 package com.shopverse.shopverseapi.service;
 
+import com.shopverse.shopverseapi.dto.ProductDTO;
 import com.shopverse.shopverseapi.models.Product;
 import com.shopverse.shopverseapi.repository.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> getAllProducts() {
         return productRepository.findAll();
+    }
+
+    @Override
+    public List<ProductDTO> getAllProductDTOs(){
+        return productRepository.findAll().stream()
+                .map(this::toDTO)
+                .toList();
     }
 
     @Override
@@ -54,5 +62,22 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
+    }
+
+    @Override
+    public List<ProductDTO> getByCategoryId(Long categoryId) {
+        return productRepository.findByCategoryId(categoryId).stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    public ProductDTO toDTO(Product product) {
+        String categoryName = product.getCategory() != null ? product.getCategory().getName() : null;
+        return new ProductDTO(
+                product.getId(),
+                product.getName(),
+                product.getPrice(),
+                categoryName
+        );
     }
 }

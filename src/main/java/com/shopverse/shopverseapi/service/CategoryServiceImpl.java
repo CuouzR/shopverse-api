@@ -1,6 +1,8 @@
 package com.shopverse.shopverseapi.service;
 
+import com.shopverse.shopverseapi.dto.CategoryDTO;
 import com.shopverse.shopverseapi.models.Category;
+import com.shopverse.shopverseapi.models.Product;
 import com.shopverse.shopverseapi.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
@@ -60,4 +62,22 @@ public class CategoryServiceImpl implements CategoryService{
     public void deleteCategoryById(Long id) {
         categoryRepository.deleteById(id);
     }
+
+    @Override
+    public CategoryDTO getCategoryDTOById(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
+
+        List<String> productNames = category.getProducts().stream()
+                .map(Product::getName)
+                .toList();
+
+        return new CategoryDTO(
+                category.getId(),
+                category.getName(),
+                category.getDescription(),
+                productNames
+        );
+    }
+
 }

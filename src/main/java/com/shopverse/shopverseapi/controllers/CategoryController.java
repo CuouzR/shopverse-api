@@ -1,7 +1,9 @@
 package com.shopverse.shopverseapi.controllers;
 
+import com.shopverse.shopverseapi.dto.CategoryDTO;
 import com.shopverse.shopverseapi.models.Category;
 import com.shopverse.shopverseapi.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +37,7 @@ public class CategoryController {
     }
 
     @PostMapping()
-    public ResponseEntity<Category> createCategory(@RequestBody Category category){
+    public ResponseEntity<Category> createCategory(@Valid @RequestBody Category category){
         try {
             Category categoryCreated = categoryService.createCategory(category);
             return new ResponseEntity<>(categoryCreated, HttpStatus.CREATED);
@@ -45,7 +47,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category category){
+    public ResponseEntity<Category> updateCategory(@Valid @PathVariable Long id, @RequestBody Category category){
         try{
             Category categoryUpdated = categoryService.updateCategory(id, category);
             return ResponseEntity.ok(categoryUpdated);
@@ -65,4 +67,15 @@ public class CategoryController {
         }
 
     }
+
+    @GetMapping("/{id}/details")
+    public ResponseEntity<CategoryDTO> getCategoryDetails(@PathVariable Long id) {
+        try {
+            CategoryDTO dto = categoryService.getCategoryDTOById(id);
+            return ResponseEntity.ok(dto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

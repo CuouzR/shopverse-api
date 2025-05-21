@@ -1,7 +1,9 @@
 package com.shopverse.shopverseapi.controllers;
 
+import com.shopverse.shopverseapi.dto.ProductDTO;
 import com.shopverse.shopverseapi.models.Product;
 import com.shopverse.shopverseapi.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +39,7 @@ public class ProductController {
     }
 
     @PostMapping()
-    public ResponseEntity<Product> createProduct(@RequestBody Product product){
+    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product){
 
         try {
             Product productCreated = productService.createProduct(product);
@@ -49,7 +51,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product){
+    public ResponseEntity<Product> updateProduct(@Valid @PathVariable Long id, @RequestBody Product product){
         try{
             Product productUpdate = productService.updateProduct(id, product);
             return ResponseEntity.ok(productUpdate);
@@ -67,4 +69,23 @@ public class ProductController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/dto")
+    public ResponseEntity<List<ProductDTO>> getAllWithCategory() {
+        List<ProductDTO> dtoList = productService.getAllProductDTOs();
+        if (dtoList.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(dtoList);
+    }
+
+    @GetMapping("/by-category/{categoryId}")
+    public ResponseEntity<List<ProductDTO>> getByCategory(@PathVariable Long categoryId) {
+        List<ProductDTO> products = productService.getByCategoryId(categoryId);
+        if (products.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(products);
+    }
+
 }
