@@ -2,27 +2,29 @@ package com.shopverse.shopverseapi.dto;
 
 public class ProductDTO {
 
-    private Long id;
+
     private String name;
     private Double price;
+    private String description;
     private String categoryName;
+    private Long categoryId;
 
     public ProductDTO(){}
 
-    public ProductDTO(Long id, String name, Double price, String categoryName) {
-        this.id = id;
+    public ProductDTO( String name, Double price,String description, Long categoryId) {
+
         this.name = name;
         this.price = price;
+        this.description = description;
+        this.categoryId = categoryId;
+    }
+    public ProductDTO(String name, String description, Double price, Long categoryId, String categoryName) {
+
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.categoryId = categoryId;
         this.categoryName = categoryName;
-
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -47,5 +49,19 @@ public class ProductDTO {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 }

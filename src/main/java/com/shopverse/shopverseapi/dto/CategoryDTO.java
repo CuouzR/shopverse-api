@@ -19,6 +19,10 @@ public class CategoryDTO {
         this.description = description;
         this.productNames = productNames;
     }
+    public CategoryDTO(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 
     public Long getId() {
         return id;
