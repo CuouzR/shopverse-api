@@ -1,17 +1,16 @@
 package com.shopverse.shopverseapi.service;
 
 import com.shopverse.shopverseapi.dto.ProductDTO;
-import com.shopverse.shopverseapi.models.Product;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface ProductService {
-    List<Product> getAllProducts();
-    List<ProductDTO> getAllProductDTOs();
-    Optional<Product> getProductById(Long id);
-    Product createProduct(Product product);
-    Product updateProduct(Long id,Product product);
+    List<ProductDTO> getAllProducts();
+    Optional<ProductDTO> getProductById(Long id);
+    ProductDTO createProduct(@Valid ProductDTO product);
+    ProductDTO updateProduct(Long id,ProductDTO product);
     void deleteProduct(Long id);
     List<ProductDTO> getByCategoryId(Long categoryId);
 }

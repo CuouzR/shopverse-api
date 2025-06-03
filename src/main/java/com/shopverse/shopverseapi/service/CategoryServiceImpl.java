@@ -19,43 +19,49 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public List<CategoryDTO> getAllCategories() {
+        return categoryRepository.findAll().stream()
+                .map(this::toDTO)
+                .toList();
     }
-
     @Override
-    public Optional<Category> getCategoryById(Long id) {
-        return categoryRepository.findById(id);
+    public Optional<CategoryDTO> getCategoryById(Long id) {
+        return categoryRepository.findById(id)
+                .map(this::toDTO);
     }
-
     @Override
-    public Category createCategory(Category category) {
-        if(category.getName() == null || category.getName().isBlank()) {
+    public CategoryDTO createCategory(CategoryDTO categoryDTO) {
+        if(categoryDTO.getName() == null || categoryDTO.getName().isBlank()) {
             throw new IllegalArgumentException("El nombre no puede estar vacio");
         }
-        if (category.getDescription().length() < 10 ) {
-            throw new IllegalArgumentException("La descripcion debe tener al menos  10 caracteres");
+        if (categoryDTO.getDescription() == null || categoryDTO.getDescription().length() < 10 ) {
+            throw new IllegalArgumentException("La descripcion debe tener al menos 10 caracteres");
         }
-        return categoryRepository.save(category);
+
+        Category category = toEntity(categoryDTO);
+        Category savedCategory = categoryRepository.save(category);
+        return toDTO(savedCategory);
     }
 
     @Override
-    public Category updateCategory(Long id, Category category) {
+    public CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO) {
         Optional<Category> categoryOptional = categoryRepository.findById(id);
         if (categoryOptional.isEmpty()) {
-            throw new IllegalArgumentException("El categoryo con ID: "+id+" no existe");
+            throw new IllegalArgumentException("La categoría con ID: "+id+" no existe");
         }
-        if (category.getDescription().length() < 10 ) {
-            throw new IllegalArgumentException("La descripcion debe tener al menos  10 caracteres");
+        if (categoryDTO.getDescription() == null || categoryDTO.getDescription().length() < 10 ) {
+            throw new IllegalArgumentException("La descripcion debe tener al menos 10 caracteres");
         }
-        if(category.getName() == null || category.getName().isBlank()) {
+        if(categoryDTO.getName() == null || categoryDTO.getName().isBlank()) {
             throw new IllegalArgumentException("El nombre no puede estar vacio");
         }
-        Category categoryToUpdate = categoryOptional.get();
-        categoryToUpdate.setName(category.getName());
-        categoryToUpdate.setDescription(category.getDescription());
 
-        return categoryRepository.save(categoryToUpdate);
+        Category categoryToUpdate = categoryOptional.get();
+        categoryToUpdate.setName(categoryDTO.getName());
+        categoryToUpdate.setDescription(categoryDTO.getDescription());
+
+        Category updatedCategory = categoryRepository.save(categoryToUpdate);
+        return toDTO(updatedCategory);
     }
 
     @Override
@@ -65,12 +71,16 @@ public class CategoryServiceImpl implements CategoryService{
 
     @Override
     public CategoryDTO getCategoryDTOById(Long id) {
-        Category category = categoryRepository.findById(id)
+        return categoryRepository.findById(id)
+                .map(this::toDTO)
                 .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
-
-        List<String> productNames = category.getProducts().stream()
-                .map(Product::getName)
-                .toList();
+    }
+    public CategoryDTO toDTO(Category category) {
+        List<String> productNames = category.getProducts() != null ?
+                category.getProducts().stream()
+                        .map(Product::getName)
+                        .toList() :
+                List.of();
 
         return new CategoryDTO(
                 category.getId(),
@@ -80,4 +90,13 @@ public class CategoryServiceImpl implements CategoryService{
         );
     }
 
+
+    public Category toEntity(CategoryDTO categoryDTO) {
+        Category category = new Category();
+        category.setName(categoryDTO.getName());
+        category.setDescription(categoryDTO.getDescription());
+
+
+        return category;
+    }
 }
